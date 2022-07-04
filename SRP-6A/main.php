@@ -23,8 +23,7 @@ class MyDB extends SQLite3
 }
 
 $db = new MyDB();
-// $db->exec('CREATE TABLE foo (bar STRING)');
-// $db->exec("INSERT INTO foo (bar) VALUES ('This is a test')");
+
 
 $result = $db->query("SELECT * FROM registered");
 
@@ -119,7 +118,9 @@ else if (isset($_POST['user']) && isset($_POST['A'])) //trying to authentificate
     $_SERVER["user_m1"] = $m1;
 
 
-    echo '{"operation":"authorized", "salt":"'.gmp_strval($salt,16).'", "B":"'.gmp_strval($B,16).'", "ss":"'.gmp_strval($ss,16).'"}';
+    echo '{"operation":"authorized", "salt":"'.gmp_strval($salt,16).'", "B":"'.gmp_strval($B,16).'"}';
+
+    // echo '{"operation":"authorized", "salt":"'.gmp_strval($salt,16).'", "B":"'.gmp_strval($B,16).'", "ss":"'.gmp_strval($ss,16).'","b":"'.gmp_strval($b,16).'","verifier":"'.gmp_strval($verifier,16).'"}';
 }
 else if (isset($_POST['user']) && isset($_POST['m1'])) //trying to authentificate
 {

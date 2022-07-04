@@ -226,13 +226,14 @@ var k = h_hash2(for_hash(N), for_hash(g));
 // client login
 
 var a = secure_random(512 / 8);
-var A = g.modPow(bigInt(a.toString(), 16), N); // check not 0
+a = bigInt(a.toString(),16);
+var A = g.modPow(a, N); // check not 0
 // login and A -> server
 
 // server login
 var b = secure_random(512 / 8);
 b = bigInt(b.toString(),16);
-var B = (bigInt(k.toString(), 16).multiply(verifier)).add(g.modPow(b,N))
+var B = (bigInt(k.toString(), 16).multiply(verifier)).add(g.modPow(b,N));
 
 // B and salt -> client
 
@@ -241,7 +242,7 @@ x = bigInt(x.toString(),16);
 k = bigInt(k.toString(),16)
 var u = h_hash2(for_hash(A),for_hash(B));
 u = bigInt(u.toString(), 16);
-var sc = bigInt(B).minus(k.multiply(g.modPow(x,N))).modPow(bigInt(a.toString(),16).add(u.multiply(x)), N);
+var sc = B.minus(k.multiply(g.modPow(x,N))).modPow(a.add(u.multiply(x)), N);
 
 var ss = (A.multiply((verifier.modPow(u,N)))).modPow(b,N);
 

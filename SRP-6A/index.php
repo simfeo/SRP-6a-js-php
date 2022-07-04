@@ -271,7 +271,7 @@ if (!$mode_force) {
     }
 
 
-    let N = bigInt("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF", 16);
+    var N = bigInt("FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF", 16);
 
     let g = bigInt(2);
 
@@ -289,7 +289,7 @@ if (!$mode_force) {
         if (login == "" || password == "") {
           return false;
         }
-        // location.replace("./index.php");
+        location.replace("./index.php");
 
         let a = bigInt(secure_random(512 / 8).toString(),16);
         let A = g.modPow(a, N); // check not 0
@@ -304,24 +304,22 @@ if (!$mode_force) {
             let salt = bigInt(scndata['salt'],16);
             let x = bigInt(h_hash2(for_hash(salt), password), 16);
             let B = bigInt(scndata['B'],16);
-            // let verifier = bigInt(scndata['verifier'],16);
             let u = bigInt(h_hash2(for_hash(A),for_hash(B)), 16);
-            let sc = ( B.minus( k.multiply( g.modPow( x, N) ) ) ).modPow( a.add( u.multiply( x ) ), N );
-            console.log(sc.toString(16));
-            console.log(scndata['ss']);
+            var sc = B.minus(k.multiply(g.modPow(x,N))).modPow(a.add(u.multiply(x)), N);
+
             // let ss = A.multiply(verifier.modPow(u,N)).modPow(b,N);         
 
             
             let m1 = sha3_512(for_hash(A.xor(B).xor(sc)));
 
-            let step2data = {};
-            step2data['user'] = login;
-            step2data['m1'] = m1.toString();
+            // let step2data = {};
+            // step2data['user'] = login;
+            // step2data['m1'] = m1.toString();
 
-            postData('./main.php', step2data)
-              .then(data => {
+            // postData('./main.php', step2data)
+            //   .then(data => {
 
-              });
+            //   });
           });
       }
 
@@ -340,11 +338,12 @@ if (!$mode_force) {
         }
 
         var salt = secure_random(512 / 8);
-        var hash = h_hash2(salt.words, password); // a.k.a. x
+        salt = bigInt(salt.toString(), 16);
+        var hash = h_hash2(for_hash(salt), password); // a.k.a. x
         var verifier = g.modPow(bigInt(hash, 16), N); // check not N and not 0 
         let data = {};
         data['user'] = login;
-        data['salt'] = salt.toString();
+        data['salt'] = salt.toString(16);
         data['verifier'] = verifier.toString(16);
         <?php if ($mode_force) : ?>
           data['mode'] = "NARE";
