@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 
 class MyDB extends SQLite3
@@ -10,12 +11,47 @@ class MyDB extends SQLite3
 }
 
 
-function startSession($isUserActivity=true, $prefix=null) {
+function isLoggedIn()
+{
+	if (!isset($_SESSION["user_name"]))
+	{
+		return false;
+	}
+	$sessionLifetime = 3600;
+	$t = time();
+
+	
+	if ( isset($_SESSION['lastactivity'])
+		&& ($t-$_SESSION['lastactivity']) <= $sessionLifetime)
+	{
+		$db = new MyDB();
+		$result = $db->query("SELECT contact_id from registered where email=\"".$_SESSION['user_name']."\"");
+		$arr = $result->fetchArray();
+		if (!$arr)
+		{
+			return false;
+		}
+		$contact_id = $arr["contact_id"];
+		
+		$result = $db->query("SELECT time_stamp from authorized where session_key=\"".$_SESSION["user_m1"]."\"");
+		$arr = $result->fetchArray();
+
+		$saved_time = $arr["time_stamp"];
+		if ( (time() - intval($saved_time)) <= 3600)
+		{
+			return true ;
+		}
+	}
+	return false;
+}
+
+function startSession($isUserActivity=true, $prefix=null)
+{
 	$sessionLifetime = 3600;
 	$idLifetime = 500;
 
 	if ( session_id() ) return true;
-	session_name('MYPROJECT'.($prefix ? '_'.$prefix : ''));
+	session_name('idimus.xyz'.($prefix ? '_'.$prefix : ''));
 	ini_set('session.cookie_lifetime', 0);
 	if ( ! session_start() ) return false;
 

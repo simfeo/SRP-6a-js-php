@@ -2,18 +2,13 @@
 
 include "utils.php";
 
-if ( !isset($_SESSION['lastactivity']) )
+if (!isLoggedIn())
 {
-    header("Location: login.php");
-    die();
-}
-else if (!startSession(true, "mine"))
-{
-    header("Location: login.php");
+    header("Location: ./login.php");
     die();
 }
 
-header("Location: main.php"); 
+header("Location: ./main.php"); 
 die();
 
 ?>

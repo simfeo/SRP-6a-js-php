@@ -1,9 +1,9 @@
 <?php
 include "utils.php";
 
-if (!startSession(true, "mine")) {
-    startSession(true, "mine");
-}
+
+startSession();
+
 
 // session_start(["cookie_lifetime" => 3600]);
 
@@ -288,7 +288,6 @@ if (!$mode_force) {
                 if (login == "" || password == "") {
                     return false;
                 }
-                location.replace("./index.php");
 
                 let a = bigInt(secure_random(512 / 8).toString(), 16);
                 let A = g.modPow(a, N); // check not 0
@@ -297,7 +296,7 @@ if (!$mode_force) {
                 data['user'] = login;
                 data['A'] = A.toString(16);
 
-                postData('./main.php', data)
+                postData('./auth.php', data)
                     .then(scndata => {
                         let k = bigInt(h_hash2(for_hash(N), for_hash(g)), 16);
                         let salt = bigInt(scndata['salt'], 16);
@@ -313,11 +312,13 @@ if (!$mode_force) {
 
                         let step2data = {};
                         step2data['user'] = login;
-                        step2data['m1'] = m1.toString();
+                        step2data['user_m1'] = m1.toString();
 
-                        postData('./main.php', step2data)
+                        postData('./auth.php', step2data)
                           .then(data => {
-
+                            if (data["operation"] == "added") {
+                                location.replace("./index.php")
+                            }
                           });
                     });
             }
@@ -351,7 +352,7 @@ if (!$mode_force) {
                 document.getElementById("alert_holder").innerHTML = "";
                 spinner_modal.toggle();
 
-                postData('./main.php', data)
+                postData('./auth.php', data)
                     .then(data => {
                         setTimeout(() => {
                             spinner_modal.toggle();
@@ -370,7 +371,7 @@ if (!$mode_force) {
 
         <?php endif; ?>
 
-        async function postData(url = './main.php', data = {
+        async function postData(url = './auth.php', data = {
             answer: 42
         }) {
             var formData = new FormData();

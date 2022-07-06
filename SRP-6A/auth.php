@@ -101,23 +101,46 @@ else if (isset($_POST['user']) && isset($_POST['A'])) //trying to authentificate
     $ss = gmp_powm(gmp_mul($A,gmp_powm($verifier, $u, $N)), $b, $N);
     $m1 = hash("sha3-512",gmp_export(gmp_xor(gmp_xor($A, $B), $ss)));
 
-    $_SERVER["user_m1"] = $m1;
-
+    $_SESSION["user_m1"] = $m1;
 
     echo '{"operation":"authorized", "salt":"'.gmp_strval($salt,16).'", "B":"'.gmp_strval($B,16).'"}';
-
+    session_commit();
     // echo '{"operation":"authorized", "salt":"'.gmp_strval($salt,16).'", "B":"'.gmp_strval($B,16).'", "ss":"'.gmp_strval($ss,16).'","b":"'.gmp_strval($b,16).'","verifier":"'.gmp_strval($verifier,16).'"}';
 }
-else if (isset($_POST['user']) && isset($_POST['m1'])) //trying to authentificate
+else if (isset($_POST['user']) && isset($_POST['user_m1'])) //trying to authentificate
 {
-    if ($_POST['user'] == $_SESSION["user_email"])
+    if (isset($_SESSION["user_m1"]) && ($_POST['user_m1'] == $_SESSION["user_m1"]))
     {
-        echo $_SERVER["user_m1"];
+
+        $result = $db->query("SELECT contact_id from registered where email=\"".$_POST['user']."\"");
+        $arr = $result->fetchArray();
+        if (!count($arr))
+        {
+            echo '{"operation":"failed"}';
+            die;
+        }
+
+        $stmt = $db->prepare("INSERT INTO authorized (session_key, contact_id, time_stamp) VALUES(:session_key, :contact_id, :time_stamp)");
+        $stmt->bindParam(':session_key', $_SESSION["user_m1"], SQLITE3_TEXT);
+        $stmt->bindParam(":contact_id", $arr["contact_id"], SQLITE3_INTEGER);
+        $t_time = strval(time());
+        $stmt->bindParam(':time_stamp', $t_time, SQLITE3_TEXT);
+        $stmt->execute();
+
+        setcookie(session_name(), session_id(), time()+3600);
+        $_SESSION["user_name"] = $_POST["user"];
+        $_SESSION['lastactivity'] = time();
+        echo '{"operation":"added"}';
+        die;
+    }
+    else
+    {
+        echo '{"operation":"failed"}';
+        die;
     }
 }
 else
 {
     echo '{"operation":"failed"}';
     die;
-
 }

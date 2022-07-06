@@ -1,3 +1,15 @@
+<?php
+include "utils.php";
+
+startSession();
+
+if (!isLoggedIn())
+{
+    header("Location: ./index.php");
+    die();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
