@@ -153,7 +153,7 @@ if (!$mode_force) {
             </div>
         </div>
 
-    <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
         Launch static backdrop modal
     </button> -->
 
@@ -296,6 +296,9 @@ if (!$mode_force) {
                 data['user'] = login;
                 data['A'] = A.toString(16);
 
+                document.getElementById("alert_holder").innerHTML = "";
+                spinner_modal.toggle();
+
                 postData('./auth.php', data)
                     .then(scndata => {
                         let k = bigInt(h_hash2(for_hash(N), for_hash(g)), 16);
@@ -315,11 +318,20 @@ if (!$mode_force) {
                         step2data['user_m1'] = m1.toString();
 
                         postData('./auth.php', step2data)
-                          .then(data => {
-                            if (data["operation"] == "added") {
-                                location.replace("./index.php")
-                            }
-                          });
+                            .then(data => {
+                                if (data["operation"] == "added") {
+                                    location.replace("./index.php")
+                                } else {
+                                    setTimeout(() => {
+                                        spinner_modal.toggle();
+                                    }, "2000")
+                                    setTimeout(() => {
+                                        document.getElementById("alert_holder").innerHTML =
+                                            `<div class="alert alert-danger" role="alert">Failed to sign in!</div>`;
+
+                                    }, "1000")
+                                }
+                            });
                     });
             }
 
