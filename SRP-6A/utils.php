@@ -4,9 +4,9 @@ session_start();
 
 class MyDB extends SQLite3
 {
-    function __construct()
-    {
-        $this->open('../public_db/users.db');
+    function __construct() {
+		$path = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'].'/../public_db/users.db');
+        $this->open($path);
     }
 }
 

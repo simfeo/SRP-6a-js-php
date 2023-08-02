@@ -36,12 +36,17 @@ if (!isLoggedIn())
             flex: 0;
         }
     </style>
+    <script src="js/utils.js"></script>
     <link href="./css/signin.css" rel="stylesheet">
 
 </head>
 
 <body class="text-center">
-    <h1 "text-center">You have sucessfully logged in.</h1>
+    <h1 class="text-center">You have sucessfully logged in.</h1>
+    <div>
+        <input id="newStatus" type="text"/>
+        <button onclick="setStatus()">Відправити</button>
+    </div>
     <footer class="my-3 footer_bottom">
         <p class="text-center text-muted">&copy;idimus <?php echo date("Y"); ?></p>
     </footer>
